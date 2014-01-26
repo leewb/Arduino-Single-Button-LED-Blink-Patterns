@@ -1,0 +1,91 @@
+/*
+Lab 2 Ex 2 - 1 Button, 2 LEDs, and 3 Blink Patterns
+Lee Saynor
+DIGF 2B03 Physical Computing
+OCAD University
+Created on Jan 26, 2014
+
+Based on:
+"State change detection (edge detection)" tutorial by Tom Igoe
+http://arduino.cc/en/Tutorial/ButtonStateChange
+...which is similar to last year's Art & Code assignment, but with 3 patterns,
+rebuilt on a Mini BB
+*/
+
+const int buttonPin = 7;     // pushbutton pin
+const int ledPinL = 13;      // Left LED pin
+const int ledPinR = 12;      // Right LED pin
+
+int buttonPushCounter = 0;   // button presses counter
+int buttonState = 0;         // current button state
+int lastButtonState = 0;     // previous button state
+
+void setup() {
+  pinMode(buttonPin, INPUT); // initialize button pin as input
+  pinMode(ledPinL, OUTPUT);  // initialize Left LED pin as output
+  pinMode(ledPinR, OUTPUT);  // initialize Right LED pin as output
+  Serial.begin(9600);        // initialize serial communication
+}
+
+void loop() {
+  // read the pushbutton input pin:
+  buttonState = digitalRead(buttonPin);
+
+  // compare buttonState to previous state
+  if (buttonState != lastButtonState) {
+    // if state has changed, increment counter
+    if (buttonState == HIGH) {
+      // if current state HIGH then the button went off to on:
+      if (buttonPushCounter > 1) {
+        // Reset buttonPushCounter to 0 when it exceeds 2:
+        buttonPushCounter = 0;
+      } else {
+        // Else increment buttonPushCounter by 1:
+        buttonPushCounter++;
+      }
+      Serial.println("on");
+      Serial.print("number of button pushes:  ");
+      Serial.println(buttonPushCounter);
+    } 
+    else {
+      // if current state LOW then button went on to off:
+      Serial.println("off"); 
+    }
+  }
+  // save current state as last state for next loop cycle 
+  lastButtonState = buttonState;
+  
+  // Switches LED pattern each time button is pressed 
+  // Modulo operator checks remainder
+  if (buttonPushCounter == 0) { 
+    // Both LEDs flash in sync:
+    digitalWrite(ledPinL, HIGH);
+    digitalWrite(ledPinR, HIGH);
+    delay(100);
+    digitalWrite(ledPinL, LOW);
+    digitalWrite(ledPinR, LOW);
+    delay(50);
+  } else if (buttonPushCounter == 1) {
+    // LEDs alternate blinking:
+    digitalWrite(ledPinL, LOW);
+    digitalWrite(ledPinR, HIGH);
+    delay(200);
+    digitalWrite(ledPinL, HIGH);
+    digitalWrite(ledPinR, LOW);
+    delay(200);    
+  } else if (buttonPushCounter == 2) {
+    // Galloping LED pattern:
+    digitalWrite(ledPinL, HIGH);
+    digitalWrite(ledPinR, LOW);
+    delay(400);
+    digitalWrite(ledPinR, HIGH);
+    delay(80);
+    digitalWrite(ledPinR, LOW);
+    delay(400);
+    digitalWrite(ledPinR, HIGH);
+    delay(80);
+    digitalWrite(ledPinL, LOW);
+    digitalWrite(ledPinR, HIGH);
+    delay(100);    
+  }
+}
